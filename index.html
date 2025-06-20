@@ -1,0 +1,324 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sakhi AI - Your Makeup Partner</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ffe6f0, #fff0f5);
+      color: #333;
+      transition: all 0.3s ease;
+    }
+    body.dark {
+      background: #06f7e536;
+      color: #c2185b;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: #ffe6f0;
+      border-bottom: 1px solid #ccc;
+    }
+    body.dark header {
+      background-color: #333;
+    }
+    .logo {
+      font-size: 1.5rem;
+      color: #ff4081;
+      font-weight: bold;
+    }
+    .logo-tagline {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: #333;
+    }
+    body.dark .theme-toggle {
+      color: #f4f4f4;
+    }
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 250px;
+      height: 100%;
+      background: #ffe4ec;
+      border-right: 1px solid #ccc;
+      padding: 1rem;
+      display: none;
+      flex-direction: column;
+      z-index: 1001;
+    }
+    .sidebar.active {
+      display: flex;
+    }
+    .sidebar h3 {
+      margin-bottom: 1rem;
+    }
+    .sidebar a {
+      margin: 0.5rem 0;
+      color: #333;
+      text-decoration: none;
+    }
+    .close-btn {
+      align-self: flex-end;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+    .main {
+      padding: 2rem;
+      text-align: center;
+    }
+    #ai-image {
+      display: none;
+      margin: 1rem auto;
+      width: 250px;
+      border-radius: 12px;
+    }
+    .btn {
+      background-color: #ff4081;
+      color: #fff;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      margin: 0.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .popup-box {
+      background: #fff0f7;
+      margin: 1rem auto;
+      padding: 1rem;
+      border-radius: 8px;
+      max-width: 600px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .popup-box.show {
+      display: block;
+    }
+    .popup-box h3 {
+      margin-bottom: 0.5rem;
+      color: #d63384;
+    }
+    .popup-box ul {
+      list-style: none;
+    }
+    .popup-box li {
+      margin: 0.3rem 0;
+    }
+    .popup-box a {
+      text-decoration: none;
+      color: #c2185b;
+      font-weight: bold;
+    }
+    .analysis-box {
+      background: #fffafc;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem auto;
+      max-width: 600px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: none;
+      color: #c2185b;
+    }
+    .analysis-box.show {
+      display: block;
+    }
+    .analysis-box h3 {
+      color: #d63384;
+      margin-bottom: 0.5rem;
+    }
+    .analysis-box p {
+      margin: 0.3rem 0;
+    }
+
+    /* Upload Styling */
+    #upload {
+      display: none;
+    }
+
+    .upload-label {
+      display: inline-block;
+      background-color: #ff4081;
+      color: #fff;
+      padding: 0.7rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.95rem;
+      transition: background-color 0.3s;
+      margin-bottom: 1rem;
+    }
+
+    .upload-label:hover {
+      background-color: #e03070;
+    }
+
+    #backToTop {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #ff4081;
+      color: #fff;
+      padding: 10px;
+      border-radius: 20%;
+      cursor: pointer;
+      display: block;
+      z-index: 1000;
+    }
+
+    @media screen and (max-width: 600px) {
+      #ai-image {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="menu-icon" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </div>
+    <div>
+      <div class="logo">
+        <i class="fas fa-kiss-wink-heart"></i> Sakhi AI
+      </div>
+      <div class="logo-tagline">your makeup partner</div>
+    </div>
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <i class="fas fa-moon"></i>&nbsp; <span>Toggle Theme</span>
+    </div>
+  </header>
+
+  <div class="sidebar" id="sidebar">
+    <div class="close-btn" onclick="toggleSidebar()">&times;</div>
+    <h3><i class="fas fa-sliders-h"></i> Menu</h3>
+    <a href="#"><i class="fas fa-history"></i> History</a>
+    <a href="#"><i class="fas fa-star"></i> Saved Looks</a>
+    <a href="#"><i class="fas fa-cog"></i> Settings</a>
+    <a href="#"><i class="fas fa-question-circle"></i> Help</a>
+    <a href="#" onclick="resetApp()"><i class="fas fa-redo"></i> Reset</a>
+  </div>
+
+  <div class="main">
+    <h2 style="margin-bottom: 0.5rem; color: #d63384;">Upload Your Image</h2>
+    <label for="upload" class="upload-label">
+      <i class="fas fa-upload"></i> Choose a photo
+    </label>
+    <input type="file" accept="image/*" id="upload" onchange="previewImage()" />
+
+    <img src="" alt="Uploaded Preview" id="ai-image" />
+
+    <div>
+      <button class="btn" onclick="getMakeupAdvice()"><i class="fas fa-magic"></i> Get Makeup Advice</button>
+      <button class="btn" onclick="downloadResult()"><i class="fas fa-download"></i> Download</button>
+      <button class="btn" onclick="shareResult()"><i class="fas fa-share-alt"></i> Share</button>
+    </div>
+
+    <div class="analysis-box" id="analysis">
+      <h3><i class="fas fa-user"></i> Face Analysis</h3>
+      <p><strong>Skin Type:</strong> Oily</p>
+      <p><strong>Face Shape:</strong> Oval</p>
+      <p><strong>Suggested Base:</strong> Matte Foundation</p>
+      <p><strong>Recommended Style:</strong> Bold Lips + Light Eyes</p>
+    </div>
+
+    <div class="popup-box" id="popup">
+      <h3><i class="fas fa-gift"></i> Recommended Products</h3>
+      <ul>
+        <li><a href="https://www.flipkart.com/search?q=foundation+for+oily+skin" target="_blank">Foundation (Flipkart)</a></li>
+        <li><a href="https://www.amazon.in/s?k=lipstick+for+fair+skin" target="_blank">Lipstick (Amazon)</a></li>
+        <li><a href="https://www.flipkart.com/search?q=compact+powder+matte" target="_blank">Compact Powder</a></li>
+        <li><a href="https://www.amazon.in/s?k=eyeliner+long+lasting" target="_blank">Long-lasting Eyeliner</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="backToTop" onclick="scrollToTop()">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    function getMakeupAdvice() {
+      document.getElementById('popup').classList.add('show');
+      document.getElementById('analysis').classList.add('show');
+      speakText("Here are your personalized skin and face shape analysis with product recommendations.");
+    }
+
+    function downloadResult() {
+      const link = document.createElement('a');
+      link.download = 'beauty_result.png';
+      link.href = document.getElementById('ai-image').src;
+      link.click();
+    }
+
+    function shareResult() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Beauty AI Result',
+          text: 'Check out my beauty AI recommendation!',
+          url: window.location.href
+        }).catch(err => console.log(err));
+      } else {
+        alert('Sharing not supported in this browser.');
+      }
+    }
+
+    function resetApp() {
+      location.reload();
+    }
+
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function previewImage() {
+      const fileInput = document.getElementById("upload");
+      const image = document.getElementById("ai-image");
+      const file = fileInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          image.src = e.target.result;
+          image.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    window.onscroll = function () {
+      document.getElementById("backToTop").style.display = window.scrollY > 300 ? "block" : "none";
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
